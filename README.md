@@ -36,17 +36,18 @@ cp .env.example .env
 
 Update the `.env` file with the correct values.
 
-- `RPC_URL` – RPC endpoint.
+- `RPC_URL` – RPC endpoint (Tenderly Virtual TestNet or public network).
 - `SPOKE_ADDRESS` – Aave v4 spoke (e.g. Core on Ethereum mainnet: `0x89914a22E30CDf88A06e801E407ca82520210a79`).
 - `RESERVE_ID` – Reserve identifier (e.g. `4` for USDC on Core).
 - `PRIVATE_KEY` – Optional deployer key used by scripts (keep it secret).
+- `TENDERLY_ACCESS_KEY` – Tenderly access token for verification.
 
 ## Usage
 
 ### Build
 
 ```shell
-$ forge build
+forge build
 ```
 
 ### Test
@@ -64,6 +65,19 @@ forge script script/Deploy_ReserveUtilization.s.sol:DeployReserveUtilization \
 ```
 
 ### Verify
+
+#### Tenderly Virtual TestNet
+
+```shell
+forge verify-contract \
+  <DEPLOYED_ADDRESS> \
+  src/ReserveUtilization.sol:ReserveUtilization \
+  --verifier-url <RPC_URL>/verify/etherscan \
+  --etherscan-api-key <TENDERLY_ACCESS_KEY> \
+  --watch
+```
+
+#### Etherscan (Public Networks)
 
 ```shell
 forge verify-contract \
