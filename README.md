@@ -1,13 +1,13 @@
-## Aave v4 Foundry Boilerplate
+## Aave v4 Position Managers
 
 This repository contains a minimal boilerplate for developing smart contracts that integrate with Aave v4 using [Foundry](https://book.getfoundry.sh/).
 
 ## Table of Contents <!-- omit in toc -->
 
-- [Requirements](#requirements)
-- [Initial Setup](#initial-setup)
-- [Usage](#usage)
-- [License](#license)
+- [Install dependencies](#install-dependencies)
+  - [Usage](#usage)
+    - [Build](#build)
+    - [Test](#test)
 
 ## Requirements
 
@@ -28,19 +28,26 @@ foundryup
 forge install
 ```
 
-Create a `.env` file copying the `.env.example` file:
+<!-- Create a `.env` file copying the `.env.example` file: -->
+
+Create a `.env` file:
+
+```bash
+# User address to fetch positions from
+USER=0x
+```
 
 ```bash
 cp .env.example .env
 ```
 
-Update the `.env` file with the correct values.
+<!-- Update the `.env` file with the correct values.
 
 - `RPC_URL` – RPC endpoint (Tenderly Virtual TestNet or public network).
 - `SPOKE_ADDRESS` – Aave v4 spoke (e.g. Core on Ethereum mainnet: `0x89914a22E30CDf88A06e801E407ca82520210a79`).
 - `RESERVE_ID` – Reserve identifier (e.g. `4` for USDC on Core).
 - `PRIVATE_KEY` – Optional deployer key used by scripts (keep it secret).
-- `TENDERLY_ACCESS_KEY` – Tenderly access token for verification.
+- `TENDERLY_ACCESS_KEY` – Tenderly access token for verification. -->
 
 ## Usage
 
@@ -56,7 +63,7 @@ forge build
 forge test
 ```
 
-### Deploy
+<!-- ### Deploy
 
 ```shell
 forge script script/Deploy_ReserveUtilization.s.sol:DeployReserveUtilization \
@@ -89,4 +96,4 @@ forge verify-contract \
 
 ## License
 
-Aave v4 Foundry Boilerplate [MIT licensed](./LICENSE)
+Aave v4 Foundry Boilerplate [MIT licensed](./LICENSE) -->

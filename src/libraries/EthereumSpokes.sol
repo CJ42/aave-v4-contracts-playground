@@ -1,0 +1,39 @@
+// SPDX-License-Identifier: UNLICENSED
+pragma solidity 0.8.x;
+
+import {ISpoke} from 'aave-v4/src/spoke/interfaces/ISpoke.sol';
+
+library EthereumSpokes {
+  ISpoke constant MAIN_SPOKE =
+    ISpoke(0x94e7A5dCbE816e498b89aB752661904E2F56c485);
+
+  ISpoke constant BLUECHIP_SPOKE =
+    ISpoke(0x973a023A77420ba610f06b3858aD991Df6d85A08);
+
+  ISpoke constant ETHENA_CORRELATED_SPOKE =
+    ISpoke(0x58131E79531caB1d52301228d1f7b842F26B9649);
+
+  ISpoke constant ETHENA_ECOSYSTEM_SPOKE =
+    ISpoke(0xba1B3D55D249692b669A164024A838309B7508AF);
+
+  ISpoke constant ETHERFI_ESP_SPOKE =
+    ISpoke(0xbF10BDfE177dE0336aFD7fcCF80A904E15386219);
+
+  ISpoke constant FOREX_SPOKE =
+    ISpoke(0xD8B93635b8C6d0fF98CbE90b5988E3F2d1Cd9da1);
+
+  ISpoke constant GOLD_SPOKE =
+    ISpoke(0x65407b940966954b23dfA3caA5C0702bB42984DC);
+
+  ISpoke constant KELP_ESP_SPOKE =
+    ISpoke(0x3131FE68C4722e726fe6B2819ED68e514395B9a4);
+
+  ISpoke constant LIDO_ESP_SPOKE =
+    ISpoke(0xe1900480ac69f0B296841Cd01cC37546d92F35Cd);
+
+  ISpoke constant LOMBARD_BTC_SPOKE =
+    ISpoke(0x7EC68b5695e803e98a21a9A05d744F28b0a7753D);
+
+  ISpoke constant TREASURY_SPOKE =
+    ISpoke(0xB9B0b8616f6Bf6841972a52058132BE08d723155);
+}
