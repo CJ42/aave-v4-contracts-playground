@@ -7,6 +7,7 @@ import {Test, console} from 'forge-std/Test.sol';
 // interfaces
 import {IERC20} from 'forge-std/interfaces/IERC20.sol';
 import {ISpoke} from 'aave-v4/src/spoke/interfaces/ISpoke.sol';
+import {IPriceOracle} from 'aave-v4/src/spoke/interfaces/IPriceOracle.sol';
 
 // libs
 import {EthereumSpokes} from 'src/libraries/EthereumSpokes.sol';
@@ -21,6 +22,11 @@ contract ForkTest is Test {
   /// must be a compile-time constant. While also reducing the level of setup (since this address is never changed)
   address immutable USER = vm.envAddress('USER');
 
+  function setUp() public {
+    vm.createSelectFork(vm.rpcUrl('mainnet'));
+  }
+
+  /// @dev This test assumes user already deposited WETH into the main spoke
   function test_UserPositionSuppliedWETH() public view {
     // struct UserPosition {
     //     uint128 drawnShares;
@@ -65,6 +71,15 @@ contract ForkTest is Test {
     });
     assertEq(userPosition.drawnShares, 0);
 
+    // CHECK health factor
+    ISpoke.UserAccountData memory userAccountData = MAIN_SPOKE
+      .getUserAccountData(USER);
+    uint256 healthFactorBefore = userAccountData.healthFactor;
+
+    // If user has no debt, `getUserAccountData` should return `type(uint256).max`
+    /// @dev See `Spoke.sol`, function: `_processUserAccountData(address,bool)`
+    assertEq(healthFactorBefore, type(uint256).max);
+
     uint256 assetsBorrowed = MAIN_SPOKE.getUserTotalDebt(
       MainSpokeReserveIds.USDC,
       USER
@@ -89,10 +104,38 @@ contract ForkTest is Test {
     });
     assertGt(userPosition.drawnShares, 0);
     assertLt(userPosition.drawnShares, amountToBorrow);
+
+    // TODO: optionally write to a JSON file to easily read the data in a spreadsheet
     console.log('drawnShares', userPosition.drawnShares);
     console.log('premiumShares', userPosition.premiumShares);
     console.log('premiumOffsetRay', userPosition.premiumOffsetRay);
     console.log('suppliedShares', userPosition.suppliedShares);
     console.log('dynamicConfigKey', userPosition.dynamicConfigKey);
+
+    userAccountData = MAIN_SPOKE.getUserAccountData(USER);
+    uint256 healthFactorAfter = userAccountData.healthFactor;
+
+    // CHECK health factor decreased after borrowing
+    assertLt(healthFactorAfter, healthFactorBefore);
+    console.log('healthFactorAfter', healthFactorAfter);
+
+    // Get the right number of decimals to simulate the returned price drop
+    uint256 reservePriceDecimals = IPriceOracle(MAIN_SPOKE.ORACLE()).decimals();
+
+    // To simulate the health factor dropping, we need to lower the ETH/USD price
+    // We can do this by mocking the price returned by the ETH/USD price feed oracle
+    vm.mockCall(
+      address(MAIN_SPOKE.ORACLE()),
+      abi.encodeCall(IPriceOracle.getReservePrice, (MainSpokeReserveIds.WETH)),
+      // 📉 answer (ETH price dropped to $1,500)
+      // TODO: refactor to make the price drop dynamically by 30%, not a fixed value
+      abi.encode(uint256(1500 * (10 ** reservePriceDecimals)))
+    );
+
+    // CHECK health factor decreased after lowering the ETH/USD price
+    userAccountData = MAIN_SPOKE.getUserAccountData(USER);
+    uint256 healthFactorAfterDrop = userAccountData.healthFactor;
+    console.log('healthFactorAfterDrop', healthFactorAfterDrop);
+    // assertLt(healthFactorAfterDrop, healthFactorAfter);
   }
 }

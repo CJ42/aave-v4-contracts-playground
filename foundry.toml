@@ -4,7 +4,6 @@ out = "out"
 libs = ["lib"]
 solc_version = "0.8.28"
 
-
 remappings = [
     "aave-v4/=lib/aave-v4/",
     "forge-std/=lib/forge-std/src/",
@@ -14,3 +13,6 @@ remappings = [
     "src/hub/=lib/aave-v4/src/hub/",
     "src/spoke/=lib/aave-v4/src/spoke/",
 ]
+
+[rpc_endpoints]
+mainnet = "https://ethereum.reth.rs/rpc"
