@@ -3,6 +3,20 @@ src = "src"
 out = "out"
 libs = ["lib"]
 solc_version = "0.8.28"
+# fs_permissions = [{ access = "read", path = "./" }]
+fs_permissions = [
+    { access = "read", path = "src/utils/JsonBindings.sol" },
+    # { access = "read", path = "utils/JsonBindings.sol" },
+    # { access = "read", path = "lib/aave-v4/tests/helpers/mocks/JsonBindings.sol" },
+    # { access = "read", path = "./config" },
+    # { access = "read", path = "./out" },
+    # { access = "read-write", path = "./output" },
+]
+skip = ["tests/helpers/mocks/JsonBindings.sol"]
+
+[bind_json]
+out = "src/utils/JsonBindings.sol"
+include = ["src/utils/EIP712TypesLocal.sol"]
 
 remappings = [
     "aave-v4/=lib/aave-v4/",
@@ -12,6 +26,7 @@ remappings = [
     "src/interfaces/=lib/aave-v4/src/interfaces/",
     "src/hub/=lib/aave-v4/src/hub/",
     "src/spoke/=lib/aave-v4/src/spoke/",
+    "tests/=lib/aave-v4/tests/",
 ]
 
 [rpc_endpoints]
