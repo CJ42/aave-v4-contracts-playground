@@ -12,6 +12,12 @@ import {IPriceOracle} from 'aave-v4/src/spoke/interfaces/IPriceOracle.sol';
 // libs
 import {EthereumSpokes} from 'src/libraries/EthereumSpokes.sol';
 import {MainSpokeReserveIds} from 'src/libraries/Reserves.sol';
+
+// helpers
+import 'src/libraries/UserData.sol' as UserDataLib;
+
+using {UserDataLib.getHealthFactor} for ISpoke;
+
 contract ForkTest is Test {
   address constant WETH = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
   IERC20 constant USDC = IERC20(0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48);
@@ -72,9 +78,7 @@ contract ForkTest is Test {
     assertEq(userPosition.drawnShares, 0);
 
     // CHECK health factor
-    ISpoke.UserAccountData memory userAccountData = MAIN_SPOKE
-      .getUserAccountData(USER);
-    uint256 healthFactorBefore = userAccountData.healthFactor;
+    uint256 healthFactorBefore = MAIN_SPOKE.getHealthFactor(USER);
 
     // If user has no debt, `getUserAccountData` should return `type(uint256).max`
     /// @dev See `Spoke.sol`, function: `_processUserAccountData(address,bool)`
@@ -112,8 +116,7 @@ contract ForkTest is Test {
     console.log('suppliedShares', userPosition.suppliedShares);
     console.log('dynamicConfigKey', userPosition.dynamicConfigKey);
 
-    userAccountData = MAIN_SPOKE.getUserAccountData(USER);
-    uint256 healthFactorAfter = userAccountData.healthFactor;
+    uint256 healthFactorAfter = MAIN_SPOKE.getHealthFactor(USER);
 
     // CHECK health factor decreased after borrowing
     assertLt(healthFactorAfter, healthFactorBefore);
@@ -133,9 +136,8 @@ contract ForkTest is Test {
     );
 
     // CHECK health factor decreased after lowering the ETH/USD price
-    userAccountData = MAIN_SPOKE.getUserAccountData(USER);
-    uint256 healthFactorAfterDrop = userAccountData.healthFactor;
+    uint256 healthFactorAfterDrop = MAIN_SPOKE.getHealthFactor(USER);
     console.log('healthFactorAfterDrop', healthFactorAfterDrop);
-    // assertLt(healthFactorAfterDrop, healthFactorAfter);
+    assertLt(healthFactorAfterDrop, healthFactorAfter);
   }
 }
