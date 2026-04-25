@@ -3,3 +3,14 @@ src = "src"
 out = "out"
 libs = ["lib"]
 solc_version = "0.8.28"
+
+
+remappings = [
+    "aave-v4/=lib/aave-v4/",
+    "forge-std/=lib/forge-std/src/",
+    # resolve aave-v4 internal `src/` folder
+    "src/dependencies/=lib/aave-v4/src/dependencies/",
+    "src/interfaces/=lib/aave-v4/src/interfaces/",
+    "src/hub/=lib/aave-v4/src/hub/",
+    "src/spoke/=lib/aave-v4/src/spoke/",
+]

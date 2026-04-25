@@ -1,3 +1,0 @@
-aave-v4/=lib/aave-v4/
-forge-std/=lib/forge-std/src/
-src/=lib/aave-v4/src/
