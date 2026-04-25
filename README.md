@@ -60,7 +60,7 @@ forge build
 ### Test
 
 ```shell
-forge test --fork-url https://ethereum.reth.rs/rpc
+forge test
 ```
 
 <!-- ### Deploy
