@@ -1,8 +1,10 @@
-## Aave v4 Position Managers
+## Aave v4 Liquidation Protection Manager
 
-This repository contains a minimal boilerplate for developing smart contracts that integrate with Aave v4 using [Foundry](https://book.getfoundry.sh/).
+This repository contains example of a Position Manager contract called [`LiquidationProtectionManager`](https://github.com/CJ42/aave-v4-contracts-playground/blob/main/src/LiquidationProtectionManager.sol) that allows users to protect their position from being liquidated.
 
-## Table of Contents <!-- omit in toc -->
+It uses the [`PositionManagerBase`](https://github.com/aave/aave-v4/blob/main/src/position-manager/PositionManagerBase.sol) as base to re-use pre-built Position Manager functionalities, such as registering spokes and setting the Position Manager contract for the user.
+
+## Table of Contents
 
 - [Install dependencies](#install-dependencies)
   - [Usage](#usage)
