@@ -1,27 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.x;
 
+// interfaces
 import {ISpoke} from 'aave-v4/src/spoke/interfaces/ISpoke.sol';
 
-///
-///
-///
-///
-///
-///
-///
-///
-///
-///
-///
-///
-///
-///
-///
-///
-///
-///
-///
+// types
+import {HealthFactor} from '../Types.sol';
 
 /**
  * @dev Helper functions to extract user data from Spoke contracts
@@ -46,6 +30,10 @@ import {ISpoke} from 'aave-v4/src/spoke/interfaces/ISpoke.sol';
  * }
  */
 
-function getHealthFactor(ISpoke spoke, address user) view returns (uint256) {
-  return spoke.getUserAccountData(user).healthFactor;
+function getHealthFactor(
+  ISpoke spoke,
+  address user
+) view returns (HealthFactor) {
+  uint256 healthFactor = spoke.getUserAccountData(user).healthFactor;
+  return HealthFactor.wrap(healthFactor);
 }

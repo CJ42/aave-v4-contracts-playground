@@ -18,6 +18,9 @@ import 'src/libraries/UserData.sol' as UserDataLib;
 
 using {UserDataLib.getHealthFactor} for ISpoke;
 
+// types
+import {HealthFactor} from 'src/Types.sol';
+
 contract ForkTest is Test {
   address constant WETH = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
   IERC20 constant USDC = IERC20(0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48);
@@ -78,7 +81,9 @@ contract ForkTest is Test {
     assertEq(userPosition.drawnShares, 0);
 
     // CHECK health factor
-    uint256 healthFactorBefore = MAIN_SPOKE.getHealthFactor(USER);
+    uint256 healthFactorBefore = HealthFactor.unwrap(
+      MAIN_SPOKE.getHealthFactor(USER)
+    );
 
     // If user has no debt, `getUserAccountData` should return `type(uint256).max`
     /// @dev See `Spoke.sol`, function: `_processUserAccountData(address,bool)`
@@ -116,7 +121,9 @@ contract ForkTest is Test {
     console.log('suppliedShares', userPosition.suppliedShares);
     console.log('dynamicConfigKey', userPosition.dynamicConfigKey);
 
-    uint256 healthFactorAfter = MAIN_SPOKE.getHealthFactor(USER);
+    uint256 healthFactorAfter = HealthFactor.unwrap(
+      MAIN_SPOKE.getHealthFactor(USER)
+    );
 
     // CHECK health factor decreased after borrowing
     assertLt(healthFactorAfter, healthFactorBefore);
@@ -136,7 +143,9 @@ contract ForkTest is Test {
     );
 
     // CHECK health factor decreased after lowering the ETH/USD price
-    uint256 healthFactorAfterDrop = MAIN_SPOKE.getHealthFactor(USER);
+    uint256 healthFactorAfterDrop = HealthFactor.unwrap(
+      MAIN_SPOKE.getHealthFactor(USER)
+    );
     console.log('healthFactorAfterDrop', healthFactorAfterDrop);
     assertLt(healthFactorAfterDrop, healthFactorAfter);
   }

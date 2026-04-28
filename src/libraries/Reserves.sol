@@ -1,6 +1,9 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity 0.8.x;
 
+// interfaces
+import {ISpoke} from 'aave-v4/src/spoke/interfaces/ISpoke.sol';
+
 library MainSpokeReserveIds {
   /// Wrapped Ether
   uint256 constant WETH = 0;
@@ -30,4 +33,11 @@ library MainSpokeReserveIds {
   uint256 constant FRXUSD = 12;
   /// Aave GHO stablecoin (GHO)
   uint256 constant GHO = 13;
+}
+
+function getUnderlyingToken(
+  ISpoke spoke,
+  uint256 reserveId
+) view returns (address) {
+  return spoke.getReserve(reserveId).underlying;
 }
