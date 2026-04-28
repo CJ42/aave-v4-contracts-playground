@@ -10,15 +10,27 @@ import {SetupHelpers} from 'aave-v4/tests/helpers/commons/SetupHelpers.sol';
 import {LiquidationProtectionManager} from '../src/LiquidationProtectionManager.sol';
 
 // interfaces
+import {IERC20} from 'forge-std/interfaces/IERC20.sol';
+import {IPriceOracle} from 'aave-v4/src/spoke/interfaces/IPriceOracle.sol';
 import {ISpoke} from 'aave-v4/src/spoke/interfaces/ISpoke.sol';
 import {ISignatureGateway} from 'aave-v4/src/position-manager/interfaces/ISignatureGateway.sol';
 
 // libs
 import {EthereumSpokes} from 'src/libraries/EthereumSpokes.sol';
+import {MainSpokeReserveIds} from 'src/libraries/Reserves.sol';
+import 'src/libraries/UserData.sol' as UserDataLib;
+
+using {UserDataLib.getHealthFactor} for ISpoke;
+
+// types
+import '../src/Types.sol';
 
 contract LiquidationProtectionManagerTest is Test, EIP712Helpers, SetupHelpers {
   /// @dev Taken from https://github.com/aave/aave-v4/blob/af1f0f2ba323ac6fbaaee3abf6be060c78e22d35/tests/setup/BaseState.sol#L80
   uint256 public constant MAX_SKIP_TIME = 10_000 days;
+
+  ISpoke constant MAIN_SPOKE = EthereumSpokes.MAIN_SPOKE;
+  IERC20 constant USDC = IERC20(0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48);
 
   LiquidationProtectionManager public positionManager;
 
@@ -47,7 +59,7 @@ contract LiquidationProtectionManagerTest is Test, EIP712Helpers, SetupHelpers {
     );
   }
 
-  function test_registerPositionManagerInSpoke() public {
+  function _registerPositonManagerInSpoke() public {
     assertFalse(
       EthereumSpokes.MAIN_SPOKE.isPositionManager(
         user,
@@ -113,6 +125,81 @@ contract LiquidationProtectionManagerTest is Test, EIP712Helpers, SetupHelpers {
         address(positionManager)
       )
     );
+  }
+
+  function test_LiquidationProtectionManager() public {
+    uint256 assetsBorrowed = MAIN_SPOKE.getUserTotalDebt(
+      MainSpokeReserveIds.USDC,
+      user
+    );
+    assertEq(assetsBorrowed, 0);
+
+    uint256 healthFactorBefore = HealthFactor.unwrap(
+      MAIN_SPOKE.getHealthFactor(user)
+    );
+    uint256 initialUsdcBalance = USDC.balanceOf(user);
+
+    // USDC has 6 decimal, but the interface is always the source of truth
+    uint256 amountToBorrow = 80 * (10 ** USDC.decimals());
+
+    vm.prank(user);
+    MAIN_SPOKE.borrow(MainSpokeReserveIds.USDC, amountToBorrow, user);
+
+    uint256 finalUsdcBalance = USDC.balanceOf(user);
+    assertGt(finalUsdcBalance, initialUsdcBalance);
+    assertEq(initialUsdcBalance + amountToBorrow, finalUsdcBalance);
+
+    ISpoke.UserPosition memory userPosition = MAIN_SPOKE.getUserPosition({
+      reserveId: MainSpokeReserveIds.USDC,
+      user: user
+    });
+    assertGt(userPosition.drawnShares, 0);
+    assertLt(userPosition.drawnShares, amountToBorrow);
+
+    uint256 healthFactorAfter = HealthFactor.unwrap(
+      MAIN_SPOKE.getHealthFactor(user)
+    );
+
+    // CHECK health factor decreased after borrowing
+    assertLt(healthFactorAfter, healthFactorBefore);
+
+    // Get the right number of decimals to simulate the returned price drop
+    uint256 reservePriceDecimals = IPriceOracle(MAIN_SPOKE.ORACLE()).decimals();
+
+    // To simulate the health factor dropping, we need to lower the ETH/USD price
+    // We can do this by mocking the price returned by the ETH/USD price feed oracle
+    vm.mockCall(
+      address(MAIN_SPOKE.ORACLE()),
+      abi.encodeCall(IPriceOracle.getReservePrice, (MainSpokeReserveIds.WETH)),
+      // 📉 answer (ETH price dropped to $1,500)
+      abi.encode(uint256(1500 * (10 ** reservePriceDecimals)))
+    );
+
+    // CHECK health factor decreased after lowering the ETH/USD price
+    uint256 healthFactorAfterDrop = HealthFactor.unwrap(
+      MAIN_SPOKE.getHealthFactor(user)
+    );
+    assertLt(healthFactorAfterDrop, healthFactorAfter);
+
+    // --------------------
+    // Position Manager functionalities
+    // --------------------
+    _registerPositonManagerInSpoke();
+
+    // Deposit funds
+    positionManager.depositFunds(address(USDC), amountToBorrow);
+
+    // Execute protection
+    positionManager.executeProtection(
+      MAIN_SPOKE,
+      MainSpokeReserveIds.USDC,
+      amountToBorrow
+    );
+
+    uint256 newHealthFactor = HealthFactor.unwrap(
+      MAIN_SPOKE.getHealthFactor(user)
+    );
+    assertGt(newHealthFactor, healthFactorAfterDrop);
   }
 
   /// @dev Workaround to not use the `EIP712Helpers` contract from `aave-v4` as the `JsonBindings.sol` are not available locally

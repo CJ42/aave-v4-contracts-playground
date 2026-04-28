@@ -113,40 +113,5 @@ contract ForkTest is Test {
     });
     assertGt(userPosition.drawnShares, 0);
     assertLt(userPosition.drawnShares, amountToBorrow);
-
-    // TODO: optionally write to a JSON file to easily read the data in a spreadsheet
-    console.log('drawnShares', userPosition.drawnShares);
-    console.log('premiumShares', userPosition.premiumShares);
-    console.log('premiumOffsetRay', userPosition.premiumOffsetRay);
-    console.log('suppliedShares', userPosition.suppliedShares);
-    console.log('dynamicConfigKey', userPosition.dynamicConfigKey);
-
-    uint256 healthFactorAfter = HealthFactor.unwrap(
-      MAIN_SPOKE.getHealthFactor(USER)
-    );
-
-    // CHECK health factor decreased after borrowing
-    assertLt(healthFactorAfter, healthFactorBefore);
-    console.log('healthFactorAfter', healthFactorAfter);
-
-    // Get the right number of decimals to simulate the returned price drop
-    uint256 reservePriceDecimals = IPriceOracle(MAIN_SPOKE.ORACLE()).decimals();
-
-    // To simulate the health factor dropping, we need to lower the ETH/USD price
-    // We can do this by mocking the price returned by the ETH/USD price feed oracle
-    vm.mockCall(
-      address(MAIN_SPOKE.ORACLE()),
-      abi.encodeCall(IPriceOracle.getReservePrice, (MainSpokeReserveIds.WETH)),
-      // 📉 answer (ETH price dropped to $1,500)
-      // TODO: refactor to make the price drop dynamically by 30%, not a fixed value
-      abi.encode(uint256(1500 * (10 ** reservePriceDecimals)))
-    );
-
-    // CHECK health factor decreased after lowering the ETH/USD price
-    uint256 healthFactorAfterDrop = HealthFactor.unwrap(
-      MAIN_SPOKE.getHealthFactor(USER)
-    );
-    console.log('healthFactorAfterDrop', healthFactorAfterDrop);
-    assertLt(healthFactorAfterDrop, healthFactorAfter);
   }
 }
