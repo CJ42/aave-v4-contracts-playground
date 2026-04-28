@@ -6,21 +6,23 @@ import {HealthFactor} from '../Types.sol';
 
 interface ILiquidationProtectionManager {
   /// @notice Deposit funds that the manager can use to repay debt on your behalf
-  /// @param token The ERC-20 token to deposit (should match your borrow asset)
+  /// @param token The ERC-20 token to deposit (should match borrowed assets)
   /// @param amount The amount to deposit
   function depositFunds(address token, uint256 amount) external;
 
   /// @notice Withdraw previously deposited funds
+  /// @param token The ERC-20 token to withdraw (should match deposited assets)
+  /// @param amount The amount to withdraw
   function withdrawFunds(address token, uint256 amount) external;
 
   /// @notice Execute protection for a user by repaying part of their debt
   /// @dev Anyone can call this (keeper, bot, or the user themselves)
   /// @param spoke The spoke to execute a repayment on
-  /// @param repayReserveId The reserve to repay (e.g., USDC)
+  /// @param reserveId The reserve to repay (e.g: USDC)
   /// @param repayAmount The amount to repay
   function executeProtection(
     ISpoke spoke,
-    uint256 repayReserveId,
+    uint256 reserveId,
     uint256 repayAmount
   ) external;
 
