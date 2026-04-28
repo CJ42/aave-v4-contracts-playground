@@ -5,9 +5,6 @@ pragma solidity ^0.8.28;
 import {Test} from 'forge-std/Test.sol';
 import {EIP712Helpers} from 'aave-v4/tests/helpers/spoke/EIP712Helpers.sol';
 import {SetupHelpers} from 'aave-v4/tests/helpers/commons/SetupHelpers.sol';
-// import {Base as AaveV4BaseTest} from 'aave-v4/tests/setup/Base.t.sol';
-
-// import 'tests/setup/Base.t.sol';
 
 // modules
 import {LiquidationProtectionManager} from '../src/LiquidationProtectionManager.sol';
@@ -19,7 +16,7 @@ import {ISignatureGateway} from 'aave-v4/src/position-manager/interfaces/ISignat
 // libs
 import {EthereumSpokes} from 'src/libraries/EthereumSpokes.sol';
 
-contract PositionManagerTest is Test, EIP712Helpers, SetupHelpers {
+contract LiquidationProtectionManagerTest is Test, EIP712Helpers, SetupHelpers {
   /// @dev Taken from https://github.com/aave/aave-v4/blob/af1f0f2ba323ac6fbaaee3abf6be060c78e22d35/tests/setup/BaseState.sol#L80
   uint256 public constant MAX_SKIP_TIME = 10_000 days;
 
@@ -34,7 +31,7 @@ contract PositionManagerTest is Test, EIP712Helpers, SetupHelpers {
     positionManager = new LiquidationProtectionManager(user);
   }
 
-  function test_Deployment() public {
+  function test_Deployment() public view {
     assertEq(positionManager.owner(), user);
   }
 

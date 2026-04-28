@@ -1,6 +1,9 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.28;
 
+import {ISpoke} from 'aave-v4/src/spoke/interfaces/ISpoke.sol';
+import {HealthFactor} from '../Types.sol';
+
 interface ILiquidationProtectionManager {
   /// @notice Deposit funds that the manager can use to repay debt on your behalf
   /// @param token The ERC-20 token to deposit (should match your borrow asset)
@@ -12,14 +15,12 @@ interface ILiquidationProtectionManager {
 
   /// @notice Execute protection for a user by repaying part of their debt
   /// @dev Anyone can call this (keeper, bot, or the user themselves)
-  /// @param user The user to protect
+  /// @param spoke The spoke to execute a repayment on
   /// @param repayReserveId The reserve to repay (e.g., USDC)
-  /// @param repayToken The token address of the repay asset
   /// @param repayAmount The amount to repay
   function executeProtection(
-    address user,
+    ISpoke spoke,
     uint256 repayReserveId,
-    address repayToken,
     uint256 repayAmount
   ) external;
 
@@ -27,6 +28,9 @@ interface ILiquidationProtectionManager {
   /// @return needsProtection Whether the health factor is below threshold
   /// @return currentHealthFactor The current health factor
   function checkPosition(
-    address user
-  ) external view returns (bool needsProtection, uint256 currentHealthFactor);
+    ISpoke spoke
+  )
+    external
+    view
+    returns (bool needsProtection, HealthFactor currentHealthFactor);
 }
