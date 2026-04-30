@@ -120,7 +120,7 @@ contract LiquidationProtectionManager is
     }
 
     // Approve spoke to pull tokens and repay
-    protectionReserves[user] -= repayAmount;
+    protectionReserves[underlyingToken] -= repayAmount;
     IERC20(underlyingToken).approve(address(spoke), repayAmount);
 
     // emit event first to prevent out of order events if function is called back

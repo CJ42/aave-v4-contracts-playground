@@ -31,6 +31,9 @@ contract LiquidationProtectionManagerTest is Test, EIP712Helpers, SetupHelpers {
 
   ISpoke constant MAIN_SPOKE = EthereumSpokes.MAIN_SPOKE;
   IERC20 constant USDC = IERC20(0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48);
+  address constant WETH = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
+
+  address constant MAIN_SPOKE_CONFIGURATOR = 0x9BFFf48BFb5A7AE70c348d4d4cb97E8DEFa5389a;
 
   LiquidationProtectionManager public positionManager;
 
@@ -41,6 +44,23 @@ contract LiquidationProtectionManagerTest is Test, EIP712Helpers, SetupHelpers {
     vm.createSelectFork(vm.rpcUrl('mainnet'));
 
     positionManager = new LiquidationProtectionManager(user);
+
+    vm.prank(user);
+    positionManager.registerOperator(address(this), true);
+
+    // equivalent of 100$ worth of ETH
+    uint256 suppliedAmount = 44000000000000000;
+
+    deal(address(WETH), user, suppliedAmount + 100 gwei);
+
+    vm.prank(user);
+    IERC20(WETH).approve(address(MAIN_SPOKE), suppliedAmount);
+
+    vm.prank(user);
+    MAIN_SPOKE.supply(MainSpokeReserveIds.WETH, suppliedAmount, user);
+
+    vm.prank(user);
+    MAIN_SPOKE.setUsingAsCollateral(MainSpokeReserveIds.WETH, true, user);
   }
 
   function test_Deployment() public view {
@@ -52,6 +72,7 @@ contract LiquidationProtectionManagerTest is Test, EIP712Helpers, SetupHelpers {
       positionManager.isSpokeRegistered(address(EthereumSpokes.MAIN_SPOKE))
     );
 
+    vm.prank(user);
     positionManager.registerSpoke(address(EthereumSpokes.MAIN_SPOKE), true);
 
     assertTrue(
@@ -59,7 +80,7 @@ contract LiquidationProtectionManagerTest is Test, EIP712Helpers, SetupHelpers {
     );
   }
 
-  function _registerPositonManagerInSpoke() public {
+  function _registerPositionManagerInSpoke() public {
     assertFalse(
       EthereumSpokes.MAIN_SPOKE.isPositionManager(
         user,
@@ -81,11 +102,14 @@ contract LiquidationProtectionManagerTest is Test, EIP712Helpers, SetupHelpers {
       approve: true
     });
 
+    uint192 nonceKey = 1;
+
     ISpoke.SetUserPositionManagers memory p = ISpoke.SetUserPositionManagers({
       onBehalfOf: user,
       updates: updates,
-      nonce: EthereumSpokes.MAIN_SPOKE.nonces(user, _randomNonceKey()),
-      deadline: _warpBeforeRandomDeadline(MAX_SKIP_TIME)
+      nonce: EthereumSpokes.MAIN_SPOKE.nonces(user, nonceKey),
+      // deadline: _warpBeforeRandomDeadline(MAX_SKIP_TIME)
+      deadline: block.timestamp + 100 days
     });
 
     // use overloaded function below
@@ -117,6 +141,9 @@ contract LiquidationProtectionManagerTest is Test, EIP712Helpers, SetupHelpers {
       user,
       p.nonce
     ); // note: nonce consumed on Main Spoke
+
+    vm.prank(MAIN_SPOKE_CONFIGURATOR);
+    MAIN_SPOKE.updatePositionManager(address(positionManager), true);
 
     // CHECK the position manager is now registered in the Spoke
     assertTrue(
@@ -184,16 +211,25 @@ contract LiquidationProtectionManagerTest is Test, EIP712Helpers, SetupHelpers {
     // --------------------
     // Position Manager functionalities
     // --------------------
-    _registerPositonManagerInSpoke();
+    _registerPositionManagerInSpoke();
 
-    // Deposit funds
-    positionManager.depositFunds(address(USDC), amountToBorrow);
+    deal(address(USDC), user, 300 * (10 ** USDC.decimals()));
+    
+    // Deposit USDC in Position Manager to repay debt
+    // 50% of the amount initially borrowed
+    uint256 repayAmount = 40 * (10 ** USDC.decimals());
+
+    vm.prank(user);
+    IERC20(USDC).approve(address(positionManager), repayAmount);
+
+    vm.prank(user);
+    positionManager.depositFunds(address(USDC), repayAmount);
 
     // Execute protection
     positionManager.executeProtection(
       MAIN_SPOKE,
       MainSpokeReserveIds.USDC,
-      amountToBorrow
+      repayAmount
     );
 
     uint256 newHealthFactor = HealthFactor.unwrap(

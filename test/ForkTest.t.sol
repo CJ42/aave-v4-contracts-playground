@@ -27,12 +27,25 @@ contract ForkTest is Test {
 
   ISpoke constant MAIN_SPOKE = EthereumSpokes.MAIN_SPOKE;
 
-  /// @dev Using immutable type here allows to bypass the Solidity compiler error flagging the initial value
-  /// must be a compile-time constant. While also reducing the level of setup (since this address is never changed)
-  address immutable USER = vm.envAddress('USER');
+  string internal constant USER = 'User';
+  address internal user = makeAddr(USER);
 
   function setUp() public {
-    vm.createSelectFork(vm.rpcUrl('mainnet'));
+    vm.createSelectFork(vm.rpcUrl('mainnet'), 24975000);
+
+    // equivalent of 100$ worth of ETH
+    uint256 suppliedAmount = 44000000000000000;
+
+    deal(address(WETH), user, suppliedAmount + 100 gwei);
+
+    vm.prank(user);
+    IERC20(WETH).approve(address(MAIN_SPOKE), suppliedAmount);
+
+    vm.prank(user);
+    MAIN_SPOKE.supply(MainSpokeReserveIds.WETH, suppliedAmount, user);
+
+    vm.prank(user);
+    MAIN_SPOKE.setUsingAsCollateral(MainSpokeReserveIds.WETH, true, user);
   }
 
   /// @dev This test assumes user already deposited WETH into the main spoke
@@ -49,14 +62,14 @@ contract ForkTest is Test {
     // }
     ISpoke.UserPosition memory userPosition = MAIN_SPOKE.getUserPosition({
       reserveId: MainSpokeReserveIds.WETH,
-      user: USER
+      user: user
     });
 
     assertGt(userPosition.suppliedShares, 0);
 
     uint256 assetsSupplied = MAIN_SPOKE.getUserSuppliedAssets(
       MainSpokeReserveIds.WETH,
-      USER
+      user
     );
     assertGt(assetsSupplied, 0);
 
@@ -76,13 +89,13 @@ contract ForkTest is Test {
     // CHECK nothing was borrowed
     ISpoke.UserPosition memory userPosition = MAIN_SPOKE.getUserPosition({
       reserveId: MainSpokeReserveIds.USDC,
-      user: USER
+      user: user
     });
     assertEq(userPosition.drawnShares, 0);
 
     // CHECK health factor
     uint256 healthFactorBefore = HealthFactor.unwrap(
-      MAIN_SPOKE.getHealthFactor(USER)
+      MAIN_SPOKE.getHealthFactor(user)
     );
 
     // If user has no debt, `getUserAccountData` should return `type(uint256).max`
@@ -91,25 +104,25 @@ contract ForkTest is Test {
 
     uint256 assetsBorrowed = MAIN_SPOKE.getUserTotalDebt(
       MainSpokeReserveIds.USDC,
-      USER
+      user
     );
     assertEq(assetsBorrowed, 0);
 
-    uint256 initialUsdcBalance = USDC.balanceOf(USER);
+    uint256 initialUsdcBalance = USDC.balanceOf(user);
 
     // USDC has 6 decimal, but the interface is always the source of truth
-    uint256 amountToBorrow = 80 * (10 ** USDC.decimals());
+    uint256 amountToBorrow = 20 * (10 ** USDC.decimals());
 
-    vm.prank(USER);
-    MAIN_SPOKE.borrow(MainSpokeReserveIds.USDC, amountToBorrow, USER);
+    vm.prank(user);
+    MAIN_SPOKE.borrow(MainSpokeReserveIds.USDC, amountToBorrow, user);
 
-    uint256 finalUsdcBalance = USDC.balanceOf(USER);
+    uint256 finalUsdcBalance = USDC.balanceOf(user);
     assertGt(finalUsdcBalance, initialUsdcBalance);
     assertEq(initialUsdcBalance + amountToBorrow, finalUsdcBalance);
 
     userPosition = MAIN_SPOKE.getUserPosition({
       reserveId: MainSpokeReserveIds.USDC,
-      user: USER
+      user: user
     });
     assertGt(userPosition.drawnShares, 0);
     assertLt(userPosition.drawnShares, amountToBorrow);

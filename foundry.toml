@@ -25,7 +25,9 @@ remappings = [
     "src/dependencies/=lib/aave-v4/src/dependencies/",
     "src/interfaces/=lib/aave-v4/src/interfaces/",
     "src/hub/=lib/aave-v4/src/hub/",
+    "src/position-manager/=lib/aave-v4/src/position-manager/",
     "src/spoke/=lib/aave-v4/src/spoke/",
+    "src/utils/=lib/aave-v4/src/utils/",
     "tests/=lib/aave-v4/tests/",
 ]
 
