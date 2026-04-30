@@ -2,14 +2,19 @@
 
 This repository contains example of a Position Manager contract called [`LiquidationProtectionManager`](https://github.com/CJ42/aave-v4-contracts-playground/blob/main/src/LiquidationProtectionManager.sol) that allows users to protect their position from being liquidated.
 
-It uses the [`PositionManagerBase`](https://github.com/aave/aave-v4/blob/main/src/position-manager/PositionManagerBase.sol) as base to re-use pre-built Position Manager functionalities, such as registering spokes and setting the Position Manager contract for the user.
+## ⚒️ Features
+
+- Inherits [`PositionManagerBase`](https://github.com/aave/aave-v4/blob/main/src/position-manager/PositionManagerBase.sol) from Aave v4 to re-use pre-built Position Manager functionalities, such as registering spokes and setting the Position Manager contract for the user.
+- Implement `HealthFactor` as user-defined value type for type safety over `uint256` primitive type.
+- Implement multiple features from latest Solidity 0.8.x releases, such as free functions, import aliases, or operator aliases for user-defined value types.
+- Mainnet fork tests against **Main Spoke** on Ethereum mainnet.
 
 ## Table of Contents
 
 - [Install dependencies](#install-dependencies)
   - [Usage](#usage)
     - [Build](#build)
-    - [Test](#test)
+    - [Run Mainnet Fork Tests](#run-mainnet-fork-tests)
 
 ## Requirements
 
@@ -30,19 +35,6 @@ foundryup
 forge install
 ```
 
-<!-- Create a `.env` file copying the `.env.example` file: -->
-
-Create a `.env` file:
-
-```bash
-# User address to fetch positions from
-USER=0x
-```
-
-```bash
-cp .env.example .env
-```
-
 <!-- Update the `.env` file with the correct values.
 
 - `RPC_URL` – RPC endpoint (Tenderly Virtual TestNet or public network).
@@ -59,7 +51,7 @@ cp .env.example .env
 forge build
 ```
 
-### Test
+### Run Mainnet Fork Tests
 
 ```shell
 forge test
