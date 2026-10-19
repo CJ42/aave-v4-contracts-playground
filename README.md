@@ -15,9 +15,9 @@ This repository contains example of a Position Manager contract called [`Liquida
 - Implement multiple features from latest Solidity 0.8.x releases, such as free functions, import aliases, or operator aliases for user-defined value types.
 - Mainnet fork tests against **Main Spoke** on Ethereum mainnet.
 
-## 🌙 Morpho Midnight — Fixed-Term Position Wrapper
+## 🌙 Morpho Midnight — Fixed-Term Position Manager
 
-See [`Contracts/morpho-midnight`](./Contracts/morpho-midnight) for an example integration with [Morpho Midnight](https://docs.morpho.org/learn/concepts/midnight/), Morpho's fixed-rate, fixed-term lending protocol.
+See [`Contracts/morpho-midnight`](./Contracts/morpho-midnight) for an example integration with [Morpho Midnight](https://docs.morpho.org/learn/concepts/midnight/), Morpho's fixed-rate, fixed-term lending protocol. Tested against a local deployment of the real Midnight contract (`cd Contracts/morpho-midnight && forge test`).
 
 ## 🔐 Zama — Confidential Token Standard (ERC-7984)
 
