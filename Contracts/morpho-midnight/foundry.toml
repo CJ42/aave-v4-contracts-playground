@@ -1,0 +1,29 @@
+# Standalone Foundry project: Midnight pins solc 0.8.34 + osaka + via-IR,
+# which conflicts with the root project's solc 0.8.28 pin.
+[profile.default]
+src = "src"
+test = "test"
+out = "out"
+cache_path = "cache"
+libs = ["../../lib"]
+solc_version = "0.8.34"
+evm_version = "osaka"
+via_ir = true
+optimizer = true
+optimizer_runs = 200
+
+remappings = [
+    "forge-std/=../../lib/forge-std/src/",
+    "midnight/=../../lib/midnight/src/",
+    "midnight-test/=../../lib/midnight/test/",
+]
+
+[fmt]
+single_line_statement_blocks = "preserve"
+quote_style = "single"
+tab_width = 2
+
+# The manager is stateless, so event ordering after external calls is harmless,
+# and ignored returns (`buyerAssets`, pending fee) are intentional. Same exclusions as upstream Midnight.
+[lint]
+exclude_lints = ["reentrancy-events", "unused-return"]

@@ -1,13 +1,27 @@
-## Aave v4 Liquidation Protection Manager
+![DeFi Integrations](.github/banner.jpg)
+
+## DeFi Integrations
+
+A playground of example smart contract integrations across DeFi protocols — Aave v4, Morpho Midnight, and Zama's Confidential Token Standard.
+
+## ⚒️ Aave v4 — Liquidation Protection Manager
 
 This repository contains example of a Position Manager contract called [`LiquidationProtectionManager`](https://github.com/CJ42/aave-v4-contracts-playground/blob/main/src/LiquidationProtectionManager.sol) that allows users to protect their position from being liquidated.
 
-## ⚒️ Features
+### Features
 
 - Inherits [`PositionManagerBase`](https://github.com/aave/aave-v4/blob/main/src/position-manager/PositionManagerBase.sol) from Aave v4 to re-use pre-built Position Manager functionalities, such as registering spokes and setting the Position Manager contract for the user.
 - Implement `HealthFactor` as user-defined value type for type safety over `uint256` primitive type.
 - Implement multiple features from latest Solidity 0.8.x releases, such as free functions, import aliases, or operator aliases for user-defined value types.
 - Mainnet fork tests against **Main Spoke** on Ethereum mainnet.
+
+## 🌙 Morpho Midnight — Fixed-Term Position Manager
+
+See [`Contracts/morpho-midnight`](./Contracts/morpho-midnight) for an example integration with [Morpho Midnight](https://docs.morpho.org/learn/concepts/midnight/), Morpho's fixed-rate, fixed-term lending protocol. Tested against a local deployment of the real Midnight contract (`cd Contracts/morpho-midnight && forge test`).
+
+## 🔐 Zama — Confidential Token Standard (ERC-7984)
+
+See [`Contracts/zama-confidential-token`](./Contracts/zama-confidential-token) for an example confidential token built on [Zama's FHEVM](https://docs.zama.org/protocol/protocol/overview) implementing [ERC-7984](https://www.zama.org/post/erc-7984-the-confidential-token-standard-explained).
 
 ## Table of Contents
 
