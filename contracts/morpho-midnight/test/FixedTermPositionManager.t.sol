@@ -113,8 +113,12 @@ contract FixedTermPositionManagerForkTest is Test {
   function test_SupplyCollateralAndBorrow() public {
     Offer memory offer = _lendOffer(lender, UNITS);
     uint256 expectedAssets = _assetsFor(UNITS);
+    bytes memory ratifierData = _sign(offer, lenderKey);
     uint256 withdrawableBefore = MIDNIGHT.withdrawable(id);
+    deal(address(WETH), borrower, collateral);
 
+    vm.startPrank(borrower);
+    WETH.approve(address(manager), collateral);
     vm.expectEmit(true, true, true, true, address(manager));
     emit Events.CollateralSuppliedAndBorrowed({
       user: borrower,
@@ -126,7 +130,8 @@ contract FixedTermPositionManagerForkTest is Test {
       units: UNITS,
       borrowedAssets: expectedAssets
     });
-    uint256 borrowed = _borrow(offer, _sign(offer, lenderKey), collateral, UNITS);
+    uint256 borrowed = manager.supplyCollateralAndBorrow(offer, ratifierData, WETH_INDEX, collateral, UNITS, 0);
+    vm.stopPrank();
 
     assertEq(borrowed, expectedAssets, 'borrowed assets');
     assertEq(USDC.balanceOf(borrower), expectedAssets, 'borrower loan balance');

@@ -8,3 +8,9 @@
 [submodule "lib/midnight"]
 	path = lib/midnight
 	url = https://github.com/morpho-org/midnight
+[submodule "lib/openzeppelin-contracts"]
+	path = lib/openzeppelin-contracts
+	url = https://github.com/OpenZeppelin/openzeppelin-contracts
+[submodule "lib/openzeppelin-confidential-contracts"]
+	path = lib/openzeppelin-confidential-contracts
+	url = https://github.com/OpenZeppelin/openzeppelin-confidential-contracts
