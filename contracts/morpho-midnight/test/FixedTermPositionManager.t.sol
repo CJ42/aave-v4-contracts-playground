@@ -21,8 +21,8 @@ import {HashLib} from 'midnight/ratifiers/libraries/HashLib.sol';
 import {TickLib} from 'midnight/libraries/TickLib.sol';
 
 // errors & events
-import * as Errors from '../src/Errors.sol';
-import * as Events from '../src/Events.sol';
+import '../src/Errors.sol' as Errors;
+import '../src/Events.sol' as Events;
 
 // types & constants
 import {UnitPrice} from '../src/Types.sol';
@@ -75,10 +75,12 @@ contract FixedTermPositionManagerForkTest is Test {
     manager = new FixedTermPositionManager();
 
     CollateralParams[] memory collateralParams = new CollateralParams[](2);
-    collateralParams[WETH_INDEX] =
-      CollateralParams({token: address(WETH), lltv: WETH_LLTV, liquidationCursor: LIQUIDATION_CURSOR, oracle: WETH_ORACLE});
-    collateralParams[1] =
-      CollateralParams({token: address(USDC), lltv: USDC_LLTV, liquidationCursor: LIQUIDATION_CURSOR, oracle: USDC_ORACLE});
+    collateralParams[WETH_INDEX] = CollateralParams({
+      token: address(WETH), lltv: WETH_LLTV, liquidationCursor: LIQUIDATION_CURSOR, oracle: WETH_ORACLE
+    });
+    collateralParams[1] = CollateralParams({
+      token: address(USDC), lltv: USDC_LLTV, liquidationCursor: LIQUIDATION_CURSOR, oracle: USDC_ORACLE
+    });
     market = Market({
       chainId: block.chainid,
       midnight: address(MIDNIGHT),
@@ -162,7 +164,9 @@ contract FixedTermPositionManagerForkTest is Test {
 
     vm.startPrank(borrower);
     WETH.approve(address(manager), collateral);
-    vm.expectRevert(abi.encodeWithSelector(Errors.InsufficientBorrowedAssets.selector, expectedAssets + 1, expectedAssets));
+    vm.expectRevert(
+      abi.encodeWithSelector(Errors.InsufficientBorrowedAssets.selector, expectedAssets + 1, expectedAssets)
+    );
     manager.supplyCollateralAndBorrow(offer, ratifierData, WETH_INDEX, collateral, UNITS, expectedAssets + 1);
     vm.stopPrank();
   }

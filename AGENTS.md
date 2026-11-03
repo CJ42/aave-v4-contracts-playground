@@ -22,11 +22,11 @@ Conventions for this repository. They apply to every integration folder under `c
 
   The same applies to struct literals (`Market({chainId: ..., midnight: ...})`).
 
-- **Errors and events live in their own files.** Each integration declares its custom errors in `Errors.sol` and its events in `Events.sol` as file-level declarations, and imports them through a namespace alias:
+- **Errors and events live in their own files.** Each integration declares its custom errors in `Errors.sol` and its events in `Events.sol` as file-level declarations, and imports them through a namespace alias (`forge fmt` normalises `import * as X from '...'` to this form):
 
   ```solidity
-  import * as Errors from './Errors.sol';
-  import * as Events from './Events.sol';
+  import './Errors.sol' as Errors;
+  import './Events.sol' as Events;
 
   require(offer.buy, Errors.NotABuyOffer());
   emit Events.CreditRedeemed({user: msg.sender, id: id, loanToken: market.loanToken, units: redeemedUnits});

@@ -10,8 +10,8 @@ import {SafeTransferLib} from 'midnight/libraries/SafeTransferLib.sol';
 import {SafeApproveLib} from 'midnight/periphery/libraries/SafeApproveLib.sol';
 
 // errors & events
-import * as Errors from './Errors.sol';
-import * as Events from './Events.sol';
+import './Errors.sol' as Errors;
+import './Events.sol' as Events;
 
 // types & constants
 import {UnitPrice} from './Types.sol';
@@ -66,10 +66,7 @@ contract FixedTermPositionManager {
     if (collateralAssets > 0) {
       _pullAndApprove(collateralToken, collateralAssets);
       MIDNIGHT.supplyCollateral({
-        market: offer.market,
-        collateralIndex: collateralIndex,
-        assets: collateralAssets,
-        onBehalf: msg.sender
+        market: offer.market, collateralIndex: collateralIndex, assets: collateralAssets, onBehalf: msg.sender
       });
     }
 
@@ -82,9 +79,7 @@ contract FixedTermPositionManager {
       takerCallback: address(0),
       takerCallbackData: ''
     });
-    require(
-      borrowedAssets >= minBorrowedAssets, Errors.InsufficientBorrowedAssets(minBorrowedAssets, borrowedAssets)
-    );
+    require(borrowedAssets >= minBorrowedAssets, Errors.InsufficientBorrowedAssets(minBorrowedAssets, borrowedAssets));
 
     emit Events.CollateralSuppliedAndBorrowed({
       user: msg.sender,
