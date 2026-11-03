@@ -25,7 +25,7 @@ This folder is a standalone Foundry project: Midnight pins `solc 0.8.34` + `osak
 
 ```bash
 git submodule update --init --recursive lib/midnight
-cd Contracts/morpho-midnight
+cd contracts/morpho-midnight
 forge test
 ```
 

@@ -19,7 +19,7 @@
 
 Written against **`@openzeppelin/confidential-contracts` v0.5.3** (latest release) and **`@fhevm/solidity` v0.13.x**. Note that OZ `main` has since moved `_update` to a 4-argument variant with a `bypassRestrictions` flag; this example targets the released API.
 
-These dependencies are not installed in this repository and `Contracts/` is outside the Foundry `src` directory. To compile:
+These dependencies are not installed in this repository and `contracts/` is outside the Foundry `src` directory. To compile:
 
 ```bash
 npm install --legacy-peer-deps \
@@ -36,7 +36,7 @@ Then add to the remappings in `foundry.toml`:
 "@fhevm/solidity/=node_modules/@fhevm/solidity/",
 ```
 
-and build with `forge build Contracts/zama-confidential-token` (solc `0.8.28`, EVM `cancun` or later).
+and build with `forge build contracts/zama-confidential-token` (solc `0.8.28`, EVM `cancun` or later).
 
 Running it end-to-end requires an FHEVM-enabled network (Sepolia / Ethereum with Zama's coprocessor) or a local FHEVM mock such as [`forge-fhevm`](https://github.com/zama-ai/forge-fhevm) or the `@fhevm/hardhat-plugin`.
 

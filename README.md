@@ -17,11 +17,11 @@ This repository contains example of a Position Manager contract called [`Liquida
 
 ## 🌙 Morpho Midnight — Fixed-Term Position Manager
 
-See [`Contracts/morpho-midnight`](./Contracts/morpho-midnight) for an example integration with [Morpho Midnight](https://docs.morpho.org/learn/concepts/midnight/), Morpho's fixed-rate, fixed-term lending protocol. Tested against a local deployment of the real Midnight contract (`cd Contracts/morpho-midnight && forge test`).
+See [`contracts/morpho-midnight`](./contracts/morpho-midnight) for an example integration with [Morpho Midnight](https://docs.morpho.org/learn/concepts/midnight/), Morpho's fixed-rate, fixed-term lending protocol. Tested against a local deployment of the real Midnight contract (`cd contracts/morpho-midnight && forge test`).
 
 ## 🔐 Zama — Confidential Token Standard (ERC-7984)
 
-See [`Contracts/zama-confidential-token`](./Contracts/zama-confidential-token) for an example confidential token built on [Zama's FHEVM](https://docs.zama.org/protocol/protocol/overview) implementing [ERC-7984](https://www.zama.org/post/erc-7984-the-confidential-token-standard-explained).
+See [`contracts/zama-confidential-token`](./contracts/zama-confidential-token) for an example confidential token built on [Zama's FHEVM](https://docs.zama.org/protocol/protocol/overview) implementing [ERC-7984](https://www.zama.org/post/erc-7984-the-confidential-token-standard-explained).
 
 ## Table of Contents
 
