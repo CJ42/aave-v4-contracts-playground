@@ -21,7 +21,7 @@ Midnight nets a sale against existing credit first, so `supplyCollateralAndBorro
 
 ## Build & test
 
-This folder is a standalone Foundry project: Midnight pins `solc 0.8.34` + `osaka` + via-IR, which conflicts with the root project's `0.8.28` pin. It uses the [`morpho-org/midnight`](https://github.com/morpho-org/midnight) submodule (pinned at `ec91a91`) from the root `lib/`.
+This folder is a standalone Foundry project (`evm_version = "osaka"` + via-IR, as required by Midnight's deployed bytecode and its structs). It reuses the [`morpho-org/midnight`](https://github.com/morpho-org/midnight) submodule from the root `lib/` for interfaces and libraries only: no Midnight source is compiled, so the project does not pin a solc version.
 
 ```bash
 git submodule update --init --recursive lib/midnight
@@ -29,11 +29,11 @@ cd contracts/morpho-midnight
 forge test
 ```
 
-The tests deploy the **real** `Midnight.sol` and `EcrecoverRatifier` locally, and lenders sign offers through the production EIP-712 offer-tree flow (single-offer tree: root = leaf, empty proof). That covers borrow (incl. fuzz), slippage, insufficient collateral, missing authorization, forged signatures, lender early exit, full repay + withdraw, unhealthy withdraw, redemption, third-party isolation and the view helpers.
+The tests run on a **Base mainnet fork** (block `53478628`) against the live Midnight deployment, the live USDC market with WETH and USDC collateral maturing on 2026-12-25 ([`0x9489…c098`](https://api.morpho.org/v0/midnight/markets/0x9489f29b589b92d28733ab15135ce6d9c4b5e64413db4326956447a3de1fc098)), and the production `EcrecoverRatifier`. Lenders sign offers through the production EIP-712 offer-tree flow (single-offer tree: root = leaf, empty proof). Coverage: borrow (incl. fuzz), slippage, insufficient collateral, missing authorization, forged signatures, lender early exit, full repay + withdraw, unhealthy withdraw, redemption, third-party isolation, event payloads and the view helpers.
 
 ## Deployment
 
-Midnight lives on **Base** (`8453`) at [`0x2F7a3AA739ba5792Ce1b4eA046117f2C0095BCA6`](https://basescan.org/address/0x2F7a3AA739ba5792Ce1b4eA046117f2C0095BCA6). Live markets, books and takeable offers (with ratifier data) are served by `https://api.morpho.org/v0/midnight/*`.
+The manager is bound at compile time to Midnight on **Base** (`8453`): [`0xAdedD8ab6dE832766Fedf0FaC4992E5C4D3EA18A`](https://basescan.org/address/0xAdedD8ab6dE832766Fedf0FaC4992E5C4D3EA18A) (`MIDNIGHT_BASE_MAINNET` in [`Constants.sol`](./src/Constants.sol)), so there is nothing to configure at deployment. All Midnight deployments are listed on [Morpho's addresses page](https://docs.morpho.org/get-started/resources/addresses/). Live markets, books and takeable offers (with ratifier data) are served by `https://api.morpho.org/v0/midnight/*`.
 
 ## Sources
 

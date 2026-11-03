@@ -4,7 +4,7 @@
 
 A playground of example smart contract integrations across DeFi protocols — Aave v4, Morpho Midnight, and Zama's Confidential Token Standard.
 
-## ⚒️ Aave v4 — Liquidation Protection Manager
+## 👻 Aave v4 — Liquidation Protection Manager
 
 This repository contains example of a Position Manager contract called [`LiquidationProtectionManager`](https://github.com/CJ42/aave-v4-contracts-playground/blob/main/src/LiquidationProtectionManager.sol) that allows users to protect their position from being liquidated.
 
@@ -15,13 +15,13 @@ This repository contains example of a Position Manager contract called [`Liquida
 - Implement multiple features from latest Solidity 0.8.x releases, such as free functions, import aliases, or operator aliases for user-defined value types.
 - Mainnet fork tests against **Main Spoke** on Ethereum mainnet.
 
-## 🌙 Morpho Midnight — Fixed-Term Position Manager
+## 🦋 Morpho Midnight — Fixed-Term Position Manager
 
-See [`contracts/morpho-midnight`](./contracts/morpho-midnight) for an example integration with [Morpho Midnight](https://docs.morpho.org/learn/concepts/midnight/), Morpho's fixed-rate, fixed-term lending protocol. Tested against a local deployment of the real Midnight contract (`cd contracts/morpho-midnight && forge test`).
+See [`contracts/morpho-midnight`](./contracts/morpho-midnight) for an example integration with [Morpho Midnight](https://docs.morpho.org/learn/concepts/midnight/), Morpho's fixed-rate, fixed-term lending protocol. Bound to the Midnight deployment on Base and tested on a **Base mainnet fork** against live markets (`cd contracts/morpho-midnight && forge test`).
 
-## 🔐 Zama — Confidential Token Standard (ERC-7984)
+## 👁️‍🗨️ Zama — Wrapped Confidential Token (ERC-7984)
 
-See [`contracts/zama-confidential-token`](./contracts/zama-confidential-token) for an example confidential token built on [Zama's FHEVM](https://docs.zama.org/protocol/protocol/overview) implementing [ERC-7984](https://www.zama.org/post/erc-7984-the-confidential-token-standard-explained).
+See [`contracts/zama-confidential-token`](./contracts/zama-confidential-token) for an example ERC-20 wrapper built on [Zama's FHEVM](https://docs.zama.org/protocol/protocol/overview) implementing [ERC-7984](https://www.zama.org/post/erc-7984-the-confidential-token-standard-explained), the confidential token standard.
 
 ## Table of Contents
 
@@ -43,10 +43,13 @@ foundryup
 
 ## Initial Setup
 
-# Install dependencies
+### Install dependencies
+
+Git submodules (`lib/`) and Soldeer packages (`dependencies/`, used for Zama's FHEVM library which is only published to npm and Soldeer):
 
 ```bash
 forge install
+forge soldeer install
 ```
 
 <!-- Update the `.env` file with the correct values.
