@@ -1,7 +1,7 @@
 [profile.default]
 src = "src"
 out = "out"
-libs = ["lib"]
+libs = ["lib", "dependencies"]
 solc_version = "0.8.28"
 # fs_permissions = [{ access = "read", path = "./" }]
 fs_permissions = [
@@ -18,18 +18,14 @@ skip = ["tests/helpers/mocks/JsonBindings.sol"]
 out = "src/utils/JsonBindings.sol"
 include = ["src/utils/EIP712TypesLocal.sol"]
 
-remappings = [
-    "aave-v4/=lib/aave-v4/",
-    "forge-std/=lib/forge-std/src/",
-    # resolve aave-v4 internal `src/` folder
-    "src/dependencies/=lib/aave-v4/src/dependencies/",
-    "src/interfaces/=lib/aave-v4/src/interfaces/",
-    "src/hub/=lib/aave-v4/src/hub/",
-    "src/position-manager/=lib/aave-v4/src/position-manager/",
-    "src/spoke/=lib/aave-v4/src/spoke/",
-    "src/utils/=lib/aave-v4/src/utils/",
-    "tests/=lib/aave-v4/tests/",
-]
 
 [rpc_endpoints]
 mainnet = "https://ethereum.reth.rs/rpc"
+
+# Soldeer packages (dependencies/). Remappings are maintained by hand in remappings.txt.
+[soldeer]
+remappings_generate = false
+
+[dependencies]
+"@fhevm-solidity" = "0.13.4"
+"@encrypted-types" = "0.0.4"

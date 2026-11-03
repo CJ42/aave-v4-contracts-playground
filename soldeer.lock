@@ -1,0 +1,13 @@
+[[dependencies]]
+name = "@encrypted-types"
+version = "0.0.4"
+url = "https://soldeer-revisions.s3.amazonaws.com/@encrypted-types/0_0_4_17-03-2026_15:04:04_encrypted-types.zip"
+checksum = "bd52cab2aaeb7083892adab700e292a5b93d9a7f321f1eb1e3aef6d7f86f2977"
+integrity = "443255d91dbfb920c9fabf76338db99ae2a60f6aefcff5cd79c21fda8c504707"
+
+[[dependencies]]
+name = "@fhevm-solidity"
+version = "0.13.4"
+url = "https://soldeer-revisions.s3.amazonaws.com/@fhevm-solidity/0_13_4_07-10-2026_11:00:58_library-solidity.zip"
+checksum = "7939bf71513e5ab2befec67299f2f8d1eb18f8f5bef92ccd324332a13e7de614"
+integrity = "3767ac372d92ca8652a1e29b50fb8b3575c33ac19fffa986d3f478898568a703"

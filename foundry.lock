@@ -14,10 +14,16 @@
   "lib/midnight": {
     "rev": "ec91a91"
   },
-  "lib/solidity-utils": {
+  "lib/openzeppelin-confidential-contracts": {
     "tag": {
-      "name": "v1.1.2",
-      "rev": "d19a9d0f0fa7271480cfac077e6b79a3d80d7d1f"
+      "name": "v0.5.3",
+      "rev": "4a4f6c71f58b75e391899b57e42e3b73d288dfe3"
+    }
+  },
+  "lib/openzeppelin-contracts": {
+    "tag": {
+      "name": "v5.6.1",
+      "rev": "5fd1781b1454fd1ef8e722282f86f9293cacf256"
     }
   }
 }
