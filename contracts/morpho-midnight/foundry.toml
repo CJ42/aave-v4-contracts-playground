@@ -1,12 +1,14 @@
-# Standalone Foundry project: Midnight pins solc 0.8.34 + osaka + via-IR,
-# which conflicts with the root project's solc 0.8.28 pin.
+# Standalone Foundry project for the Morpho Midnight integration.
+#
+# Tests run on a Base mainnet fork against the live Midnight deployment, so no Midnight
+# source is compiled here and no solc version is pinned: the manager only needs the
+# `^0.8.28` features it declares. `osaka` is required to execute Midnight's deployed bytecode.
 [profile.default]
 src = "src"
 test = "test"
 out = "out"
 cache_path = "cache"
 libs = ["../../lib"]
-solc_version = "0.8.34"
 evm_version = "osaka"
 via_ir = true
 optimizer = true
@@ -15,8 +17,14 @@ optimizer_runs = 200
 remappings = [
     "forge-std/=../../lib/forge-std/src/",
     "midnight/=../../lib/midnight/src/",
-    "midnight-test/=../../lib/midnight/test/",
 ]
+
+[rpc_endpoints]
+base = "https://mainnet.base.org"
+
+[fuzz]
+# fork tests: every run replays real Midnight bytecode, keep the fuzz budget modest
+runs = 64
 
 [fmt]
 single_line_statement_blocks = "preserve"

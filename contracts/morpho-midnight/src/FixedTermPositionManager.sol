@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity 0.8.34;
+pragma solidity ^0.8.28;
 
 // interfaces
 import {IMidnight, Market, Offer} from 'midnight/interfaces/IMidnight.sol';
@@ -9,11 +9,13 @@ import {IdLib} from 'midnight/libraries/IdLib.sol';
 import {SafeTransferLib} from 'midnight/libraries/SafeTransferLib.sol';
 import {SafeApproveLib} from 'midnight/periphery/libraries/SafeApproveLib.sol';
 
-/// @dev Price of one Midnight unit (a claim on 1 loan token at maturity), in WAD.
-/// A price `P` implies a fixed rate of `1 / P - 1` over the remaining term.
-type UnitPrice is uint256;
+// errors & events
+import * as Errors from './Errors.sol';
+import * as Events from './Events.sol';
 
-uint256 constant WAD = 1e18;
+// types & constants
+import {UnitPrice} from './Types.sol';
+import {WAD, MIDNIGHT_BASE_MAINNET} from './Constants.sol';
 
 /// @title FixedTermPositionManager
 /// @author Jean Cavallera (CJ42)
@@ -25,34 +27,12 @@ uint256 constant WAD = 1e18;
 /// and approvals to Midnight are for the exact amount pulled, so no allowance is left behind.
 /// Because Midnight's authorization is all-or-nothing, every entry point hard-codes
 /// `msg.sender` as both `onBehalf` and receiver, so a caller can only ever act on their own position.
+///
+/// The manager is bound at compile time to the Midnight deployment on Base mainnet, so there is
+/// nothing to configure at deployment.
 contract FixedTermPositionManager {
-  IMidnight public immutable MIDNIGHT;
-
-  error ZeroAddress();
-  error WrongMidnight(address expected, address actual);
-  error NotABuyOffer();
-  error InsufficientBorrowedAssets(uint256 minAssets, uint256 receivedAssets);
-  error NothingToRedeem();
-  error InvalidUnitPrice(UnitPrice price);
-  error ZeroTimeToMaturity();
-
-  event CollateralSuppliedAndBorrowed(
-    address indexed user,
-    bytes32 indexed id,
-    uint256 collateralIndex,
-    uint256 collateralAssets,
-    uint256 units,
-    uint256 borrowedAssets
-  );
-  event RepaidAndWithdrawn(
-    address indexed user, bytes32 indexed id, uint256 repaidUnits, uint256 collateralIndex, uint256 withdrawnAssets
-  );
-  event CreditRedeemed(address indexed user, bytes32 indexed id, uint256 units);
-
-  constructor(IMidnight midnight) {
-    require(address(midnight) != address(0), ZeroAddress());
-    MIDNIGHT = midnight;
-  }
+  /// @notice The Midnight instance every market must point to.
+  IMidnight public constant MIDNIGHT = IMidnight(MIDNIGHT_BASE_MAINNET);
 
   /// @notice Supply collateral and borrow at a fixed rate by selling `units` into a lender's buy offer.
   ///
@@ -79,12 +59,18 @@ contract FixedTermPositionManager {
     uint256 minBorrowedAssets
   ) external returns (uint256 borrowedAssets) {
     _checkMarket(offer.market);
-    require(offer.buy, NotABuyOffer());
+    require(offer.buy, Errors.NotABuyOffer());
+
+    address collateralToken = offer.market.collateralParams[collateralIndex].token;
 
     if (collateralAssets > 0) {
-      address collateralToken = offer.market.collateralParams[collateralIndex].token;
       _pullAndApprove(collateralToken, collateralAssets);
-      MIDNIGHT.supplyCollateral(offer.market, collateralIndex, collateralAssets, msg.sender);
+      MIDNIGHT.supplyCollateral({
+        market: offer.market,
+        collateralIndex: collateralIndex,
+        assets: collateralAssets,
+        onBehalf: msg.sender
+      });
     }
 
     (, borrowedAssets) = MIDNIGHT.take({
@@ -96,13 +82,17 @@ contract FixedTermPositionManager {
       takerCallback: address(0),
       takerCallbackData: ''
     });
-    require(borrowedAssets >= minBorrowedAssets, InsufficientBorrowedAssets(minBorrowedAssets, borrowedAssets));
+    require(
+      borrowedAssets >= minBorrowedAssets, Errors.InsufficientBorrowedAssets(minBorrowedAssets, borrowedAssets)
+    );
 
-    emit CollateralSuppliedAndBorrowed({
+    emit Events.CollateralSuppliedAndBorrowed({
       user: msg.sender,
       id: IdLib.toId(offer.market),
+      collateralToken: collateralToken,
       collateralIndex: collateralIndex,
       collateralAssets: collateralAssets,
+      loanToken: offer.market.loanToken,
       units: units,
       borrowedAssets: borrowedAssets
     });
@@ -130,17 +120,25 @@ contract FixedTermPositionManager {
 
     if (repaidUnits > 0) {
       _pullAndApprove(market.loanToken, repaidUnits);
-      MIDNIGHT.repay(market, repaidUnits, msg.sender, address(0), '');
+      MIDNIGHT.repay({market: market, units: repaidUnits, onBehalf: msg.sender, callback: address(0), data: ''});
     }
 
     if (withdrawnAssets > 0) {
-      MIDNIGHT.withdrawCollateral(market, collateralIndex, withdrawnAssets, msg.sender, msg.sender);
+      MIDNIGHT.withdrawCollateral({
+        market: market,
+        collateralIndex: collateralIndex,
+        assets: withdrawnAssets,
+        onBehalf: msg.sender,
+        receiver: msg.sender
+      });
     }
 
-    emit RepaidAndWithdrawn({
+    emit Events.RepaidAndWithdrawn({
       user: msg.sender,
       id: id,
+      loanToken: market.loanToken,
       repaidUnits: repaidUnits,
+      collateralToken: market.collateralParams[collateralIndex].token,
       collateralIndex: collateralIndex,
       withdrawnAssets: withdrawnAssets
     });
@@ -163,11 +161,11 @@ contract FixedTermPositionManager {
     } else {
       redeemedUnits = units;
     }
-    require(redeemedUnits > 0, NothingToRedeem());
+    require(redeemedUnits > 0, Errors.NothingToRedeem());
 
-    MIDNIGHT.withdraw(market, redeemedUnits, msg.sender, msg.sender);
+    MIDNIGHT.withdraw({market: market, units: redeemedUnits, onBehalf: msg.sender, receiver: msg.sender});
 
-    emit CreditRedeemed(msg.sender, id, redeemedUnits);
+    emit Events.CreditRedeemed({user: msg.sender, id: id, loanToken: market.loanToken, units: redeemedUnits});
   }
 
   /// @notice Annualized fixed rate implied by a unit price, as simple (non-compounding) interest.
@@ -176,8 +174,8 @@ contract FixedTermPositionManager {
   /// @return rate Annual rate in WAD (e.g. `0.05e18` = 5% APR).
   function impliedRate(UnitPrice price, uint256 timeToMaturity) external pure returns (uint256 rate) {
     uint256 rawPrice = UnitPrice.unwrap(price);
-    require(rawPrice > 0 && rawPrice <= WAD, InvalidUnitPrice(price));
-    require(timeToMaturity > 0, ZeroTimeToMaturity());
+    require(rawPrice > 0 && rawPrice <= WAD, Errors.InvalidUnitPrice(price));
+    require(timeToMaturity > 0, Errors.ZeroTimeToMaturity());
 
     uint256 periodRate = (WAD * WAD) / rawPrice - WAD;
     rate = (periodRate * 365 days) / timeToMaturity;
@@ -193,7 +191,7 @@ contract FixedTermPositionManager {
     SafeApproveLib.safeApprove(token, address(MIDNIGHT), amount);
   }
 
-  function _checkMarket(Market calldata market) internal view {
-    require(market.midnight == address(MIDNIGHT), WrongMidnight(address(MIDNIGHT), market.midnight));
+  function _checkMarket(Market calldata market) internal pure {
+    require(market.midnight == address(MIDNIGHT), Errors.WrongMidnight(address(MIDNIGHT), market.midnight));
   }
 }
