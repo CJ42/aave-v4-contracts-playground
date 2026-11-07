@@ -1,0 +1,8 @@
+aave-v4/=lib/aave-v4/
+forge-std/=lib/forge-std/src/
+lib/aave-v4/:src/=lib/aave-v4/src/
+lib/aave-v4/:tests/=lib/aave-v4/tests/
+@openzeppelin/contracts/=lib/openzeppelin-contracts/contracts/
+@openzeppelin/confidential-contracts/=lib/openzeppelin-confidential-contracts/contracts/
+@fhevm/solidity/=dependencies/@fhevm-solidity-0.13.4/
+encrypted-types/=dependencies/@encrypted-types-0.0.4/

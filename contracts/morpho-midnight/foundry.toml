@@ -1,0 +1,37 @@
+# Standalone Foundry project for the Morpho Midnight integration.
+#
+# Tests run on a Base mainnet fork against the live Midnight deployment, so no Midnight
+# source is compiled here and no solc version is pinned: the manager only needs the
+# `^0.8.28` features it declares. `osaka` is required to execute Midnight's deployed bytecode.
+[profile.default]
+src = "src"
+test = "test"
+out = "out"
+cache_path = "cache"
+libs = ["../../lib"]
+evm_version = "osaka"
+via_ir = true
+optimizer = true
+optimizer_runs = 200
+
+remappings = [
+    "forge-std/=../../lib/forge-std/src/",
+    "midnight/=../../lib/midnight/src/",
+]
+
+[rpc_endpoints]
+base = "https://mainnet.base.org"
+
+[fuzz]
+# fork tests: every run replays real Midnight bytecode, keep the fuzz budget modest
+runs = 64
+
+[fmt]
+single_line_statement_blocks = "preserve"
+quote_style = "single"
+tab_width = 2
+
+# The manager is stateless, so event ordering after external calls is harmless,
+# and ignored returns (`buyerAssets`, pending fee) are intentional. Same exclusions as upstream Midnight.
+[lint]
+exclude_lints = ["reentrancy-events", "unused-return"]
