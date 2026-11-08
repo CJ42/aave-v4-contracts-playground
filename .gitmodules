@@ -14,3 +14,15 @@
 [submodule "lib/openzeppelin-confidential-contracts"]
 	path = lib/openzeppelin-confidential-contracts
 	url = https://github.com/OpenZeppelin/openzeppelin-confidential-contracts
+[submodule "lib/erc-3643"]
+	path = lib/erc-3643
+	url = https://github.com/ERC-3643/ERC-3643
+[submodule "lib/onchain-id"]
+	path = lib/onchain-id
+	url = https://github.com/onchain-id/solidity
+[submodule "lib/openzeppelin-contracts-v4"]
+	path = lib/openzeppelin-contracts-v4
+	url = https://github.com/OpenZeppelin/openzeppelin-contracts
+[submodule "lib/openzeppelin-contracts-upgradeable-v4"]
+	path = lib/openzeppelin-contracts-upgradeable-v4
+	url = https://github.com/OpenZeppelin/openzeppelin-contracts-upgradeable
