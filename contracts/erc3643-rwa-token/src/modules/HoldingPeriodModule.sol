@@ -162,7 +162,7 @@ contract HoldingPeriodModule is AbstractModuleUpgradeable {
     if (locks.length == 0) return;
 
     _removeExpiredLocks(locks);
-    uint256 locked;
+    uint256 locked = 0;
     for (uint256 i = 0; i < locks.length; i++) {
       locked += locks[i].amount;
     }
@@ -211,7 +211,7 @@ contract HoldingPeriodModule is AbstractModuleUpgradeable {
   /// @dev Compacts `locks` in place, keeping the remaining locks in their original order.
   function _removeExpiredLocks(Lock[] storage locks) private {
     uint256 length = locks.length;
-    uint256 kept;
+    uint256 kept = 0;
     for (uint256 i = 0; i < length; i++) {
       if (locks[i].releaseTime > block.timestamp) {
         if (kept != i) locks[kept] = locks[i];

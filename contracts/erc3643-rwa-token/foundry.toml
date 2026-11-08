@@ -33,3 +33,9 @@ runs = 256
 single_line_statement_blocks = "preserve"
 quote_style = "single"
 tab_width = 2
+
+# Tests call T-REX functions for their side effects and assert on balances afterwards.
+[lint]
+ignore = ["test/**/*.sol"]
+# Holding periods are measured in months: the few seconds a validator can skew a timestamp are immaterial.
+exclude_lints = ["block-timestamp"]

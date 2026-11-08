@@ -2,7 +2,7 @@
 
 ## DeFi Integrations
 
-A playground of example smart contract integrations across DeFi protocols — Aave v4, Morpho Midnight, and Zama's Confidential Token Standard.
+A playground of example smart contract integrations across DeFi protocols — Aave v4, Morpho Midnight, Zama's Confidential Token Standard, and ERC-3643 permissioned tokens.
 
 ## 👻 Aave v4 — Liquidation Protection Manager
 
@@ -22,6 +22,10 @@ See [`contracts/morpho-midnight`](./contracts/morpho-midnight) for an example in
 ## 👁️‍🗨️ Zama — Wrapped Confidential Token (ERC-7984)
 
 See [`contracts/zama-confidential-token`](./contracts/zama-confidential-token) for an example ERC-20 wrapper built on [Zama's FHEVM](https://docs.zama.org/protocol/protocol/overview) implementing [ERC-7984](https://www.zama.org/post/erc-7984-the-confidential-token-standard-explained), the confidential token standard.
+
+## 🦖 ERC-3643 (T-REX) — Tokenized Stock
+
+See [`contracts/erc3643-rwa-token`](./contracts/erc3643-rwa-token) for a real-world-asset example: a tokenized share class on the official [ERC-3643](https://eips.ethereum.org/EIPS/eip-3643) T-REX contracts, with accredited-investor claims, a country allowlist and a Rule 144 holding period (`cd contracts/erc3643-rwa-token && forge test`).
 
 ## Table of Contents
 
