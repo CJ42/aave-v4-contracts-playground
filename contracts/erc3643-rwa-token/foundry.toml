@@ -1,0 +1,35 @@
+# Standalone Foundry project for the ERC-3643 (T-REX) tokenized stock example.
+#
+# The T-REX and OnchainID sources pin `pragma solidity 0.8.17` and are compiled here, so this
+# project is locked to that compiler and to the `london` EVM it targets. They also require
+# OpenZeppelin v4, while the repository root uses v5: remappings are explicit and auto-detection
+# is off so `@openzeppelin/*` can only ever resolve to the v4 install.
+[profile.default]
+src = "src"
+test = "test"
+out = "out"
+cache_path = "cache"
+libs = ["../../lib"]
+solc_version = "0.8.17"
+evm_version = "london"
+optimizer = true
+optimizer_runs = 200
+auto_detect_remappings = false
+# 3628: the T-REX and OnchainID proxies have a payable fallback without `receive`, which is intended.
+ignored_error_codes = [3628]
+
+remappings = [
+    "forge-std/=../../lib/forge-std/src/",
+    "@erc3643org/erc-3643/=../../lib/erc-3643/",
+    "@onchain-id/solidity/=../../lib/onchain-id/",
+    "@openzeppelin/contracts/=../../lib/openzeppelin-contracts-v4/contracts/",
+    "@openzeppelin/contracts-upgradeable/=../../lib/openzeppelin-contracts-upgradeable-v4/contracts/",
+]
+
+[fuzz]
+runs = 256
+
+[fmt]
+single_line_statement_blocks = "preserve"
+quote_style = "single"
+tab_width = 2
